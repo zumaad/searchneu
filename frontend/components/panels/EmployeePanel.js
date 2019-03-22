@@ -6,6 +6,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import ReactTooltip from 'react-tooltip';
+
 import macros from '../macros';
 
 import globe from './globe.svg';
@@ -52,7 +54,14 @@ export default class EmployeePanel extends React.Component {
       showMoreThanTitle: false,
     };
 
+    // When a phone number of email is clicked on desktop,
+    // a popup shows that says "Copied!". This timeout will hide the tooltip after a while.
+    this.hideTimeout = null;
+
     this.toggleShowMoreThanTitle = this.toggleShowMoreThanTitle.bind(this);
+    this.copyOnClick = this.copyOnClick.bind(this);
+    this.hideTooltipOnEvent = this.hideTooltipOnEvent.bind(this);
+    this.showTooltipOnEvent = this.showTooltipOnEvent.bind(this);
   }
 
   injectBRs(arr) {
@@ -78,11 +87,41 @@ export default class EmployeePanel extends React.Component {
     });
   }
 
+  // Shows the Copied! tooltip, starts the hide timeout, and copies the text.
+  copyOnClick(event) {
+    event.target.setAttribute('data-tip', 'Copied!');
+
+    const target = event.target;
+
+    ReactTooltip.show(target);
+
+    // Start a timer to hide the target
+    this.hideTimeout = setTimeout(() => {
+      // Check to make sure it is still in the document
+      if (document.contains(target)) {
+        ReactTooltip.hide(target);
+      }
+    }, 1250);
+
+
+    macros.copyToClipboard(target.innerText);
+  }
+
+  showTooltipOnEvent(event) {
+    clearTimeout(this.hideTimeout);
+    event.target.setAttribute('data-tip', 'Click to copy');
+    ReactTooltip.show(event.target);
+  }
+
+  hideTooltipOnEvent(event) {
+    clearTimeout(this.hideTimeout);
+    ReactTooltip.hide(event.target);
+  }
+
   render() {
     const employee = this.props.employee;
 
     // Create the address box
-
     let firstColumn = [];
     let secondColumn = [];
 
@@ -100,10 +139,41 @@ export default class EmployeePanel extends React.Component {
       contactRows.push(employee.officeRoom);
     }
 
+    // Events to run if the link is clicked on desktop
+    // These will show a "Click to copy" when hovered
+    // and a "Copied!" when it is clicked
+    // If we want to enable this functionality on mobile too
+    // use just the onClick method for mobile, and don't use the other two.
+    const copyOnClickEvents = {
+      onClick: this.copyOnClick,
+      onMouseEnter: this.showTooltipOnEvent,
+      onMouseLeave: this.hideTooltipOnEvent,
+    };
 
     if (employee.emails) {
       employee.emails.forEach((email) => {
-        contactRows.push(<a key={ email } href={ `mailto:${email}` }>{email}</a>);
+        let events;
+        if (macros.isMobile) {
+          events = {
+            href: `mailto:${email}`,
+          };
+        } else {
+          events = copyOnClickEvents;
+        }
+
+
+        contactRows.push(
+          <a
+            key={ email }
+            className='employeeEmail'
+            data-tip=''
+            role='button'
+            tabIndex={ 0 }
+            { ...events }
+          >
+            {email}
+          </a>,
+        );
       });
     }
 
@@ -118,8 +188,18 @@ export default class EmployeePanel extends React.Component {
 
       const phoneText = phone.join('');
 
+      let events;
+      if (macros.isMobile) {
+        events = {
+          href: `tel:${employee.phone}`,
+        };
+      } else {
+        events = copyOnClickEvents;
+      }
+
+
       contactRows.push(
-        <a key='tel' href={ `tel:${phoneText}` }>
+        <a key='tel' data-tip='' className='employeePhone' role='button' tabIndex={ 0 } { ...events }>
           {phoneText}
         </a>,
       );
@@ -178,7 +258,8 @@ export default class EmployeePanel extends React.Component {
       linkElement = (
         <span className='classGlobeLink'>
           <a
-            key='jfdalsj'
+            data-tip={ `View on ${macros.collegeHost}` }
+            key='0'
             target='_blank'
             rel='noopener noreferrer'
             className='inlineBlock'

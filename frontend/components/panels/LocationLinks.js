@@ -13,12 +13,7 @@ import macros from '../macros';
 // This is used in both the mobile section panel and the desktop section panel.
 
 function LocationLinks(props) {
-  // Don't render anything if the class is online.
-  if (props.section.online) {
-    return null;
-  }
-
-  const elements = props.section.getLocations().map((location, index, locations) => {
+  const elements = props.locations.map((location, index, locations) => {
     let buildingName;
     if (location.match(/\d+\s*$/i)) {
       buildingName = location.replace(/\d+\s*$/i, '');
@@ -31,12 +26,12 @@ function LocationLinks(props) {
       optionalComma = ', ';
     }
 
-    if (location.toUpperCase() === 'TBA') {
+    if (location.toUpperCase() === 'TBA' || location.toUpperCase() === 'LOCATION TBA') {
       if (locations.length > 1) {
         return null;
       }
 
-      return 'TBA';
+      return location;
     }
 
     if (location.toUpperCase() === 'BOSTON DEPT') {
@@ -69,7 +64,7 @@ function LocationLinks(props) {
 
 
 LocationLinks.propTypes = {
-  section: PropTypes.object.isRequired,
+  locations: PropTypes.array.isRequired,
 };
 
 

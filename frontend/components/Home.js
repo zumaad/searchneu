@@ -25,12 +25,32 @@ import boston from './boston.svg';
 // Terms that used to be scraped at one point, but are no longer scraped.
 // These may be stored in user's localStorage from the last time they selected a term.
 // If they are, unselected them and select the latest term.
-const OLD_TERMS = ['201858', '201855', '201854', '201852', '201838', '201835', '201834', '201832', '201830', '201828', '201825'];
+const OLD_TERMS = [
+  '201858',
+  '201855',
+  '201854',
+  '201852',
+  '201838',
+  '201835',
+  '201834',
+  '201832',
+  '201830',
+  '201828',
+  '201825',
+  '201840',
+  '201860',
+  '201850',
+  '201730',
+  '201630',
+  '201810',
+  '201820',
+  '201910',
+];
 
-// The lastest term
-const LATEST_TERM = '201930';
+// The lastest term - Fall 2019
+const LATEST_TERM = '202010';
 
-const SHOW_SUBMIT_EMAIL = true;
+const SHOW_SUBMIT_EMAIL = false;
 
 
 // Home page component
@@ -44,7 +64,7 @@ class Home extends React.Component {
     // Check the following sources, in order, for the current selected term. If any are found, use that one and don't continue.
     // 1. The url.
     // 2. Localstorage
-    // 3. Default to Spring 2019.
+    // 3. Default to LATEST_TERM (As of now this is Fall 2019).
 
     // After the term is found, keep it in localstorage in case the url is changed or the
     // Keeping this in localStorage makes it sticky across page loads.
@@ -53,11 +73,11 @@ class Home extends React.Component {
     } else if (window.localStorage.selectedTermId) {
       selectedTermId = window.localStorage.selectedTermId;
     } else {
-      // Defalt to Spring 2019 (need to make this dynamic in the future...)
+      // Defalt to LATEST_TERM (need to make this dynamic in the future...)
       selectedTermId = LATEST_TERM;
     }
 
-    // If the user had Spring 2017 selected (which is no longer scraped) change the option to Spring 2019
+    // If the user had an old semester selected (which is no longer scraped) change the option to LATEST_TERM
     if (OLD_TERMS.includes(selectedTermId)) {
       selectedTermId = LATEST_TERM;
     }
@@ -102,9 +122,6 @@ class Home extends React.Component {
     // Reference to the raw DOM element of the input box.
     // Updated with react refs when the render function runs.
     this.inputElement = null;
-
-    // Used to get the height of the results container element so we can move the stuff below the container up the amount it was transformed.
-    this.resultsContainerElement = null;
 
     // Timer used for hidding the search results after an interval
     this.hideSearchResultsTimeout = null;
@@ -500,24 +517,24 @@ class Home extends React.Component {
 
     const termDropDownOptions = [
       {
+        text: 'Fall 2019',
+        value: '202010',
+      },
+      {
+        text: 'Summer I 2019',
+        value: '201940',
+      },
+      {
+        text: 'Summer II 2019',
+        value: '201960',
+      },
+      {
+        text: 'Summer Full 2019',
+        value: '201950',
+      },
+      {
         text: 'Spring 2019',
         value: '201930',
-      },
-      {
-        text: 'Fall 2018',
-        value: '201910',
-      },
-      {
-        text: 'Summer I 2018',
-        value: '201840',
-      },
-      {
-        text: 'Summer II 2018',
-        value: '201860',
-      },
-      {
-        text: 'Summer Full 2018',
-        value: '201850',
       },
     ];
 
@@ -535,9 +552,9 @@ class Home extends React.Component {
               Want to help build Search NEU?
           </p>
           <p>
-            <span role='button' tabIndex={ 0 } className={ `getInvolvedText ${hiddenHelpButton}` } onClick={ this.openHelpModal }>
+            <a href='https://scout1.typeform.com/to/FFksIl' target='_blank' rel='noopener noreferrer' className={ `getInvolvedText ${hiddenHelpButton}` }>
               Get involved &gt;
-            </span>
+            </a>
           </p>
         </div>
       );
@@ -648,7 +665,7 @@ class Home extends React.Component {
         </div>
 
         <div style={ resultsContainerStyle } className='resultsContainer'>
-          <div ref={ (element) => { this.resultsContainerElement = element; } }>
+          <div>
             {resultsElement}
           </div>
 

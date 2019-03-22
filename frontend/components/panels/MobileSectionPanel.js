@@ -66,15 +66,26 @@ export default class MobileSectionPanel extends React.Component {
         const examDayMoment = examMeeting.endDate;
         const examTimeMoment = examMeeting.times[0][0].start;
 
+        let examLocation = examMeeting.where;
 
-        examRow = (
-          <tr>
+        if (examLocation === 'TBA') {
+          examLocation = 'Location TBA';
+        }
+
+        examRow = [
+          <tr key='0'>
             <td className='firstColumn'>Exam</td>
             <td className='secondColumn'>
               {examDayMoment.format('MMMM Do @ ') + examTimeMoment.format('h:mm a')}
             </td>
-          </tr>
-        );
+          </tr>,
+          <tr key='1'>
+            <td className='firstColumn'>Exam</td>
+            <td className='secondColumn'>
+              <LocationLinks locations={ [examLocation] } />
+            </td>
+          </tr>,
+        ];
       }
     }
 
@@ -104,6 +115,11 @@ export default class MobileSectionPanel extends React.Component {
       );
     }
 
+    // Format the location of the section
+    let sectionLocations = null;
+    if (!this.props.section.online) {
+      sectionLocations = <LocationLinks locations={ this.props.section.getLocations() } />;
+    }
 
     return (
       <div className='section-container'>
@@ -132,7 +148,7 @@ export default class MobileSectionPanel extends React.Component {
             <tr style={{ display: this.props.section.online && 'none' }}>
               <td className='firstColumn'>Place</td>
               <td className='secondColumn'>
-                <LocationLinks section={ this.props.section } />
+                {sectionLocations}
               </td>
             </tr>
             <tr style={{ display: this.props.section.online && 'none' }}>
@@ -147,7 +163,6 @@ export default class MobileSectionPanel extends React.Component {
                 <WeekdayBoxes section={ this.props.section } />
               </td>
             </tr>
-            {examRow}
             <tr style={{ display: hasWaitList && 'none' }}>
               <td className='firstColumn'>Seats</td>
               <td className='secondColumn'>
@@ -155,6 +170,7 @@ export default class MobileSectionPanel extends React.Component {
               </td>
             </tr>
             {waitlistRow}
+            {examRow}
           </tbody>
         </table>
       </div>
