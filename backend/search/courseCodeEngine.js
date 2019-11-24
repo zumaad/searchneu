@@ -32,6 +32,7 @@ class CourseCodeEngine {
   }
 
   suggestString(suggestResults) {
+    console.log(suggestResults[0]);
     return suggestResults.map((result) => {
       return (result.options.length !== 0 ? result.options[0].text : result.text);
     }).join('');

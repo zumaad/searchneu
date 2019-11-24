@@ -238,7 +238,7 @@ class Elastic {
   }
 
   async termSuggest(query, field) {
-    const results = await client.search({
+    const theJson = {
       index: `${this.CLASS_INDEX}`,
       body: {
         text: query,
@@ -249,7 +249,11 @@ class Elastic {
           },
         },
       },
-    });
+    };
+
+    console.log(JSON.stringify(theJson));
+      
+    const results = await client.search(theJson);
 
     return results.body.suggest.termSuggest;
   }
