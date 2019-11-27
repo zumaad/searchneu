@@ -4,6 +4,7 @@
  * See the license file in the root folder for details.
  */
 
+const util = require('util');
 import { Client } from '@elastic/elasticsearch';
 import _ from 'lodash';
 import macros from './macros';
@@ -238,22 +239,20 @@ class Elastic {
   }
 
   async termSuggest(query, field) {
-    const theJson = {
+    const results = await client.search({
       index: `${this.CLASS_INDEX}`,
       body: {
-        text: query,
-        termSuggest: {
-          term: {
-            field: field,
-            min_word_length: 2,
+        suggest: {
+          text: query,
+          termSuggest: {
+            term: {
+              field: field,
+              min_word_length: 2,
+            },
           },
         },
       },
-    };
-
-    console.log(JSON.stringify(theJson));
-      
-    const results = await client.search(theJson);
+    });
 
     return results.body.suggest.termSuggest;
   }
@@ -261,6 +260,7 @@ class Elastic {
   // there MUST be an index on searchField.suggestion for this to work.
   async phraseSuggest(query, searchField) {
     const suggestField = `${searchField}.suggestions`;
+
     const results = await client.search({
       index: `${this.CLASS_INDEX}`,
       body: {
