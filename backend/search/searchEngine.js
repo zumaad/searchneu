@@ -1,3 +1,8 @@
+/*
+ * This file is part of Search NEU and licensed under AGPL3.
+ * See the license file in the root folder for details.
+ */
+
 import elastic from '../elastic';
 import courseCodeEngine from './courseCodeEngine';
 import baseEngine from './baseEngine';
@@ -7,6 +12,9 @@ class SearchEngine {
     this.engines = [courseCodeEngine, baseEngine];
   }
 
+  /**
+   *
+   */
   async search(query, termId, min, max) {
     console.log(query);
     console.log('the search begins');

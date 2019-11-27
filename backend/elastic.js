@@ -198,8 +198,9 @@ class Elastic {
    * @param  {string}  termId The termId to look within
    * @param  {integer} min    The index of first document to retreive
    * @param  {integer} max    The index of last document to retreive
+   * @param  {Object}  fields The fields being searched against along with scoring rules
    */
-  async search(query, termId, min, max, searchFields) {
+  async search(query, termId, min, max, fields) {
     const searchOutput = await client.search({
       index: `${this.CLASS_INDEX}`,
       from: min,
@@ -215,7 +216,7 @@ class Elastic {
               multi_match: {
                 query: query,
                 type: 'most_fields', // More fields match => higher score
-                fields: searchFields,
+                fields: fields,
               },
             },
             filter: {
@@ -238,6 +239,9 @@ class Elastic {
     };
   }
 
+  /**
+   * Generate a suggestion based on term-analysis
+   */
   async termSuggest(query, field) {
     const results = await client.search({
       index: `${this.CLASS_INDEX}`,
